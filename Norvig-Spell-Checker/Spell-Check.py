@@ -11,6 +11,8 @@ Also sincē 2000, there has been a rise in large languaghe models (LLMs), which 
 
 
 from termcolor import colored
+import re
+
 
 
 import re
@@ -80,14 +82,17 @@ for i in range(len(lines)):
         cleanWord = oneWord.replace('.', '');
         cleanWord = cleanWord.replace(',', '')
         cleanWord = cleanWord.replace('"', '')
-        isCorrect = correction(cleanWord);
-        if (cleanWord != isCorrect):
+        correctWord = correction(cleanWord); # correctWord = คำที่ถูกต้องที่ผ่านการแก้ไขจาก Norvig
+        checkConditionBothdigitsAndletter = not bool(re.search(r'\d', cleanWord)) and bool(re.search(r'[a-zA-Z]', cleanWord))
+        # check เงื่อนไขเพราะจะมีคำบางคำอย่าง "1950s" ที่ norvig จะเปลี่ยนเป็น 500 ให้ ซึ่งมันไม่ถูกเพราะ 1950s มันได้ใจความอยู่แล้ว เลยเช็กเงื่อนไข พวกคำที่มีทั้งตัวอักษรและตัวเลขปนอยู่ ให้คงคำนั้นไว้ ไม่ต้องไปเปลี่ยน
+        # print(checkConditionBothdigitsAndletter , cleanWord) # ถ้า The = False , 1950s = True 
+        if (cleanWord.lower() != correctWord.lower() and checkConditionBothdigitsAndletter):
             numberOfIncorrect+=1;
             # print("คำคือ ", oneWord , "แก้เป็น : ", correction(oneWord) , '\n');
             # คำผิดก็ใส่
-            textList.append(colored(isCorrect, 'red'))
+            textList.append(colored(correctWord, 'red'))
             # ไฮไลท์คือคำที่โดนแก้
-            arrayToTable.append([number ,i , wordSequence , cleanWord ,isCorrect]) # arrayToTable ก็จะมี oneWord คือคำที่โดนแก้
+            arrayToTable.append([number ,i , wordSequence , cleanWord , correctWord]) # arrayToTable ก็จะมี oneWord คือคำที่โดนแก้
             number+=1;
         else:
             # กรณีคำถูกก็ใส่
